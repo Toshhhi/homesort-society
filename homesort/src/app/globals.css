@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  /* User requested palette */
+  --color-brand-white: #ffffff;
+  --color-brand-silver: #bbbfbf;
+  --color-brand-gray: #878787;
+  --color-brand-accent: #05ad98;
+  
+  /* Additional tones for the modern dark Sidebar/Navbar */
+  --color-brand-dark: #121212;
+  --color-brand-darker: #0a0a0a;
+  --color-brand-surface: #1e1e1e;
+  
+  /* Main dashboard background */
+  --color-brand-bg: #f4f5f7;
+}
+
+body {
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-dark);
+}

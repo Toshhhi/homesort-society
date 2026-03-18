@@ -1,0 +1,62 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+// import Navbar from "./Navbar";
+
+const adminLinks = [
+  { label: "Dashboard", href: "/admin/dashboard" },
+  { label: "Flats", href: "/admin/flats" },
+  { label: "Subscriptions", href: "/admin/subscriptions" },
+  { label: "Monthly Records", href: "/admin/monthly-subscriptions" },
+  { label: "Payment Entry", href: "/admin/payment-entry" },
+  { label: "Reports", href: "/admin/reports" },
+  { label: "Notifications", href: "/admin/notifications" },
+  { label: "Profile", href: "/admin/profile" },
+];
+
+export default function AdminSidebar() {
+  const pathname = usePathname();
+
+  return (
+    <>
+      {/* <Navbar title="Homesort " role="admin" /> */}
+      <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col overflow-y-auto border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl transition-all duration-300">
+        {/* <div className="flex-1>" */}
+        {/* Logo / title area */}
+        <div className="mb-10 px-2">
+          {/* <p className="text-xs font-bold uppercase tracking-widest text-brand-gray">
+            Admin Panel
+          </p> */}
+        </div>
+
+        <nav className="flex flex-col gap-3 relative">
+          {adminLinks.map((link) => {
+            const isActive = pathname === link.href;
+            // || pathname.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={`${link.label}-${link.href}`}
+                href={link.href}
+                className={`group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all duration-300 hover:translate-x-1 ${
+                  isActive
+                    ? "bg-brand-surface text-brand-white shadow-md shadow-brand-surface/50"
+                    : "text-brand-silver hover:bg-brand-surface hover:text-brand-white"
+                }`}
+              >
+                <div
+                  className={`mr-4 h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                    isActive
+                      ? "bg-brand-accent shadow-[0_0_8px_0_var(--color-brand-accent)]"
+                      : "bg-brand-surface group-hover:bg-brand-accent"
+                  }`}
+                ></div>
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
+  );
+}
