@@ -14,6 +14,7 @@ import notificationsRoutes from "./routes/notificationsRoutes.js";
 import adminProfilePageRoutes from "./routes/adminProfileRoutes.js";
 import residentSubscirptionRoutes from "./routes/residentSubscriptionRoutes.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
+import residentProfileRoutes from "./routes/residentProfileRoutes.js";
 import "./config/passport.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
@@ -52,6 +53,7 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/admin/profile", adminProfilePageRoutes);
 app.use("/api/resident-subscriptions", residentSubscirptionRoutes);
 app.use("/api/dashboard", adminDashboardRoutes);
+app.use("/api/resident-profile", residentProfileRoutes);
 app.get("/", (req, res) => {
   res.send("running");
 });

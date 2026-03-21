@@ -23,7 +23,6 @@ export default function ResidentSidebar() {
 
   return (
     <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl">
-      {/* TOP */}
       <div className="flex-1">
         <div className="mb-10 px-2"></div>
 
@@ -53,16 +52,6 @@ export default function ResidentSidebar() {
             );
           })}
         </nav>
-      </div>
-
-      {/* BOTTOM LOGOUT */}
-      <div className="border-t border-brand-surface pt-4">
-        <button
-          onClick={handleLogout}
-          className="w-full rounded-xl bg-red-500 px-4 py-2 text-white hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
       </div>
     </aside>
   );
