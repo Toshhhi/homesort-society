@@ -37,11 +37,17 @@ export default function ResidentSidebar() {
                 href={link.href}
                 className={`group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all duration-300 hover:translate-x-1 ${
                   isActive
-                    ? "bg-brand-surface text-brand-white"
+                    ? "bg-brand-surface text-brand-white shadow-md shadow-brand-surface/50"
                     : "text-brand-silver hover:bg-brand-surface hover:text-brand-white"
                 }`}
               >
-                <div className="mr-4 h-2.5 w-2.5 rounded-full bg-brand-surface group-hover:bg-brand-accent"></div>
+                <div
+                  className={`mr-4 h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                    isActive
+                      ? "bg-brand-accent shadow-[0_0_8px_0_var(--color-brand-accent)]"
+                      : "bg-brand-surface group-hover:bg-brand-accent"
+                  }`}
+                ></div>
                 {link.label}
               </Link>
             );

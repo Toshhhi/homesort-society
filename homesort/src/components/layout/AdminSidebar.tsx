@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 // import Navbar from "./Navbar";
 
 const adminLinks = [
@@ -17,23 +17,23 @@ const adminLinks = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  async function handleLogout() {
+    await fetch("http://localhost:5000/api/logout", {
+      credentials: "include",
+    });
+    router.push("/login");
+  }
+return (
+    <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl">
+      {/* TOP */}
+      <div className="flex-1">
+        <div className="mb-10 px-2"></div>
 
-  return (
-    <>
-      {/* <Navbar title="Homesort " role="admin" /> */}
-      <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col overflow-y-auto border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl transition-all duration-300">
-        {/* <div className="flex-1>" */}
-        {/* Logo / title area */}
-        <div className="mb-10 px-2">
-          {/* <p className="text-xs font-bold uppercase tracking-widest text-brand-gray">
-            Admin Panel
-          </p> */}
-        </div>
-
-        <nav className="flex flex-col gap-3 relative">
+        <nav className="flex flex-col gap-3">
           {adminLinks.map((link) => {
             const isActive = pathname === link.href;
-            // || pathname.startsWith(`${link.href}/`);
+
             return (
               <Link
                 key={`${link.label}-${link.href}`}
@@ -56,7 +56,17 @@ export default function AdminSidebar() {
             );
           })}
         </nav>
-      </aside>
-    </>
+      </div>
+
+      {/* BOTTOM LOGOUT */}
+      <div className="border-t border-brand-surface pt-4">
+        <button
+          onClick={handleLogout}
+          className="w-full rounded-xl bg-red-500 px-4 py-2 text-white hover:bg-red-600 transition"
+        >
+          Logout
+        </button>
+      </div>
+    </aside>
   );
 }
