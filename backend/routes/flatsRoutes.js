@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllFlats,
+  getFlatById,
   createFlat,
   updateFlat,
   deleteFlat,
@@ -13,5 +14,6 @@ router.get("/", getAllFlats);
 router.post("/", createFlat);
 router.put("/:id", updateFlat);
 router.delete("/:id", deleteFlat);
+router.get("/:id", getFlatById);
 
 export default router;

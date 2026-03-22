@@ -142,8 +142,7 @@ export default function ResidentProfilePage() {
     setPassword("");
     setIsEditing(false);
   }
-
-  // UPDATED: prevent form submit side effects before logout
+ 
   async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     await logout();

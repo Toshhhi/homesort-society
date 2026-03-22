@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
 
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 type DashboardStats = {
   totalFlats: number;
   collectedThisMonth: number;
@@ -92,6 +105,18 @@ export default function AdminDashboardPage() {
     return <div className="p-6 text-red-500">No dashboard data found.</div>;
   }
 
+  const paymentStatusData = [
+    { name: "Paid", value: stats.paidCount },
+    { name: "Pending", value: stats.pendingPayments },
+  ];
+
+  const monthlyData = [
+    { name: "Paid", value: stats.paidCount },
+    { name: "Pending", value: stats.pendingPayments },
+    { name: "Total", value: stats.totalMonthlyRecords },
+  ];
+
+  const COLORS = ["#22c55e", "#f59e0b"];
   return (
     <div className="flex w-full flex-col gap-6">
       <div>
@@ -245,6 +270,49 @@ export default function AdminDashboardPage() {
             <p className="mt-1 text-2xl font-black text-white">
               {stats.collectionRate}%
             </p>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm">
+          <h3 className="mb-4 text-xl font-bold text-white">Payment Status</h3>
+
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={paymentStatusData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={100}
+                  label
+                >
+                  {paymentStatusData.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* BAR CHART */}
+        <div className="rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm">
+          <h3 className="mb-4 text-xl font-bold text-white">
+            Monthly Overview
+          </h3>
+
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

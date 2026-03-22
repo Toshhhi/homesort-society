@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logout } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 type AdminProfile = {
   id: number;
@@ -17,6 +19,8 @@ export default function AdminProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const router = useRouter();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showPasswordCard, setShowPasswordCard] = useState(false);
@@ -51,7 +55,7 @@ export default function AdminProfilePage() {
         throw new Error(result?.message || "Failed to fetch logged-in user");
       }
 
-      setAdminId(result.id);
+      setAdminId(result.user?.id ?? result.id ?? null);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -120,14 +124,16 @@ export default function AdminProfilePage() {
     }));
   }
 
-  function handleEditProfile() {
+  function handleEditProfile(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setSuccess("");
     setError("");
     setIsEditingProfile(true);
     setShowPasswordCard(false);
   }
 
-  function handleCancelEditProfile() {
+  function handleCancelEditProfile(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setIsEditingProfile(false);
     setSuccess("");
     setError("");
@@ -141,14 +147,16 @@ export default function AdminProfilePage() {
     }
   }
 
-  function handleShowPasswordCard() {
+  function handleShowPasswordCard(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setSuccess("");
     setError("");
     setShowPasswordCard(true);
     setIsEditingProfile(false);
   }
 
-  function handleCancelPasswordChange() {
+  function handleCancelPasswordChange(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setShowPasswordCard(false);
     setSuccess("");
     setError("");
@@ -202,6 +210,12 @@ export default function AdminProfilePage() {
     } finally {
       setSavingProfile(false);
     }
+  }
+
+  async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    await logout();
+    window.location.href = "/login";
   }
 
   async function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -434,8 +448,28 @@ export default function AdminProfilePage() {
               >
                 Cancel
               </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded border border-red-400 px-4 py-2 text-red-500 hover:bg-red-50"
+              >
+                Logout
+              </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {!showPasswordCard && !isEditingProfile && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded border border-red-400 px-4 py-2 text-red-500 hover:bg-red-50"
+          >
+            Logout
+          </button>
         </div>
       )}
     </div>

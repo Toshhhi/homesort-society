@@ -100,3 +100,35 @@ export const deleteFlat = async (req, res) => {
     }
   }
 };
+
+export const getFlatById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT id, flat_no, flat_type, owner, email
+      FROM flats
+      WHERE id = $1
+      `,
+      [id],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Flat not found" });
+    }
+
+    const flat = result.rows[0];
+
+    return res.status(200).json({
+      id: flat.id,
+      flatNumber: flat.flat_no,
+      flatType: flat.flat_type,
+      ownerName: flat.owner,
+      email: flat.email,
+    });
+  } catch (error) {
+    console.error("GET FLAT BY ID ERROR:", error);
+    return res.status(500).json({ message: "Failed to fetch flat details" });
+  }
+};
