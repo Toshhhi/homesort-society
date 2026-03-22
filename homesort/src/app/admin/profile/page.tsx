@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { logout } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type AdminProfile = {
   id: number;
@@ -248,7 +249,7 @@ export default function AdminProfilePage() {
       if (!res.ok) {
         throw new Error(result?.message || "Failed to update password");
       }
-
+      toast.success("Profile updated!");
       setSuccess(result?.message || "Password updated successfully");
       setShowPasswordCard(false);
       setPasswordForm({
@@ -260,7 +261,7 @@ export default function AdminProfilePage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong while updating password");
+        toast.error("Something went wrong while updating password");
       }
     } finally {
       setSavingPassword(false);

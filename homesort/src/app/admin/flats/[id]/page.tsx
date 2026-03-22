@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type FlatForm = {
   flatNumber: string;
@@ -23,21 +24,19 @@ export default function EditFlatPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
 
   async function fetchFlat() {
     try {
       setLoading(true);
-      setError("");
 
       const res = await fetch(`http://localhost:5000/api/flats/${params.id}`);
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to fetch flat details");
-      }
+      const flat = await res.json().catch(() => null);
 
-      const flat = await res.json();
+      if (!res.ok) {
+        toast.error(flat?.message || "Failed to fetch flat details");
+        return;
+      }
 
       setFormData({
         flatNumber: flat.flatNumber,
@@ -45,12 +44,8 @@ export default function EditFlatPage() {
         ownerName: flat.ownerName,
         email: flat.email,
       });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while fetching flat");
-      }
+    } catch {
+      toast.error("Something went wrong while fetching flat");
     } finally {
       setLoading(false);
     }
@@ -77,7 +72,6 @@ export default function EditFlatPage() {
 
     try {
       setSaving(true);
-      setError("");
 
       const payload = {
         flat_no: formData.flatNumber,
@@ -94,18 +88,18 @@ export default function EditFlatPage() {
         body: JSON.stringify(payload),
       });
 
+      const result = await res.json().catch(() => null);
+
       if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to update flat");
+        toast.error(result?.message || "Failed to update flat");
+        return;
       }
 
+      toast.success("Flat details updated successfully");
+
       router.push("/admin/flats");
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while updating flat");
-      }
+    } catch {
+      toast.error("Something went wrong while updating flat");
     } finally {
       setSaving(false);
     }
@@ -120,8 +114,6 @@ export default function EditFlatPage() {
       <h1 className="mb-4 text-2xl font-semibold">Edit Flat</h1>
 
       <div className="max-w-xl rounded border bg-white p-6 shadow-sm">
-        {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
-
         <form onSubmit={handleUpdateFlat} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium">Flat No</label>

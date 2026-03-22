@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Summary = {
   total_records: string;
@@ -52,9 +53,10 @@ export default function ReportsPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch report");
+        toast.error(result?.message || "Failed to fetch report");
       }
 
+      toast.success("Successfully downloaded the report!");
       setSummary(result.summary || null);
       setPaymentModeBreakdown(result.paymentModeBreakdown || []);
       setMonthlyBreakdown(result.monthlyBreakdown || []);
@@ -62,7 +64,7 @@ export default function ReportsPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Subscription = {
   id: number;
@@ -41,7 +42,8 @@ export default function EditSubscriptionPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch subscription");
+        toast.error(result?.message || "Failed to fetch subscription");
+        return;
       }
 
       setSubscription(result);
@@ -55,7 +57,7 @@ export default function EditSubscriptionPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -100,9 +102,11 @@ export default function EditSubscriptionPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to update subscription");
+        toast.error(result?.message || "Failed to update subscription");
+        return;
       }
 
+      toast.success("Updated Successfully!");
       router.push("/admin/subscriptions");
     } catch (err) {
       if (err instanceof Error) {
@@ -133,7 +137,6 @@ export default function EditSubscriptionPage() {
         {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
 
         <form onSubmit={handleUpdate} className="space-y-4">
-          {/* ADDED: show flat type as read-only */}
           <div>
             <label className="mb-1 block text-sm font-medium">Flat Type</label>
             <input

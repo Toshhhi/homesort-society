@@ -12,6 +12,7 @@ import {
   useReactTable,
   SortingState,
 } from "@tanstack/react-table";
+import { toast } from "sonner";
 
 type Flat = {
   id: number;
@@ -25,7 +26,6 @@ const columnHelper = createColumnHelper<Flat>();
 
 export default function FlatsPage() {
   const router = useRouter();
-
   const [data, setData] = useState<Flat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,7 +58,7 @@ export default function FlatsPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong!");
       }
     } finally {
       setLoading(false);
@@ -69,7 +69,6 @@ export default function FlatsPage() {
     fetchFlats();
   }, []);
 
-  // UPDATED: Add now navigates to a new page
   function handleAddFlat() {
     router.push("/admin/flats/new");
   }
@@ -94,16 +93,17 @@ export default function FlatsPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to delete flat");
+
+        toast.error(errData?.message || "Failed to delete flat");
+        return;
       }
+
+      // ✅ success toast
+      toast.success("Flat deleted successfully");
 
       await fetchFlats();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while deleting");
-      }
+      toast.error("Something went wrong while deleting!");
     }
   }
 

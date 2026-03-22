@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type Subscription = {
   id: number;
@@ -13,29 +14,27 @@ type Subscription = {
 
 export default function SubscriptionsPage() {
   const router = useRouter();
-
   const [data, setData] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   async function fetchSubscriptions() {
     try {
       setLoading(true);
-      setError("");
 
       const res = await fetch("http://localhost:5000/api/subscriptions");
 
       if (!res.ok) {
-        throw new Error("Failed to fetch subscriptions");
+        toast.error("Failed to fetch subscriptions");
+        return;
       }
-
+      
       const result = await res.json();
       setData(result);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -46,13 +45,11 @@ export default function SubscriptionsPage() {
     fetchSubscriptions();
   }, []);
 
-  // UPDATED: edit now goes to a separate page
   function handleEdit(plan: Subscription) {
     router.push(`/admin/subscriptions/${plan.id}`);
   }
 
   if (loading) return <div className="p-6">Loading subscriptions...</div>;
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
 
   return (
     <div className="p-6">
@@ -73,7 +70,6 @@ export default function SubscriptionsPage() {
               <th className="border-b px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {data.length > 0 ? (
               data.map((plan) => (

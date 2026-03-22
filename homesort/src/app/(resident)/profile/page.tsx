@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { getUser, logout } from "@/lib/auth";
 
 type ResidentProfile = {
@@ -22,14 +23,11 @@ export default function ResidentProfilePage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
   async function fetchProfile() {
     try {
       setLoading(true);
-      setError("");
 
       const user = await getUser();
 
@@ -50,16 +48,17 @@ export default function ResidentProfilePage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch profile");
+        toast.error(result?.message || "Failed to fetch profile");
+        return;
       }
 
       setProfile(result);
       setPhone(result.phone || "");
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -75,11 +74,10 @@ export default function ResidentProfilePage() {
 
     try {
       setSaving(true);
-      setError("");
-      setSuccess("");
 
       if (!profile?.email) {
-        throw new Error("Resident profile not found");
+        toast.error("Resident profile not found");
+        return;
       }
 
       const payload: { phone?: string; password?: string } = {};
@@ -106,43 +104,38 @@ export default function ResidentProfilePage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to update profile");
+        toast.error(result?.message || "Failed to update profile");
+        return;
       }
 
-      setSuccess(result?.message || "Profile updated successfully");
+      toast.success(result?.message || "Profile updated successfully");
       setPassword("");
       setIsEditing(false);
 
       await fetchProfile();
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError("Something went wrong while updating profile");
+        toast.error("Something went wrong while updating profile");
       }
     } finally {
       setSaving(false);
     }
   }
 
-  // UPDATED: prevent form/navigation side effects on Edit click
   function handleEdit(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setIsEditing(true);
   }
 
-  // UPDATED: prevent form/navigation side effects on Cancel click
   function handleCancel(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setPhone(profile?.phone || "");
     setPassword("");
     setIsEditing(false);
   }
- 
+
   async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     await logout();
@@ -151,10 +144,6 @@ export default function ResidentProfilePage() {
 
   if (loading) {
     return <div className="p-6">Loading profile...</div>;
-  }
-
-  if (error && !profile) {
-    return <div className="p-6 text-red-500">{error}</div>;
   }
 
   return (
@@ -167,9 +156,6 @@ export default function ResidentProfilePage() {
       </div>
 
       <div className="max-w-2xl rounded-lg border bg-white p-6 shadow-sm">
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-        {success && <div className="mb-4 text-green-600">{success}</div>}
-
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="mb-1 block text-sm font-medium">Username</label>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type MonthlyRecord = {
   id: number;
@@ -21,7 +22,6 @@ export default function MonthlyRecordsPage() {
   const [year, setYear] = useState(String(today.getFullYear()));
   const [data, setData] = useState<MonthlyRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   async function fetchMonthlyRecords(
     selectedMonth: string,
@@ -29,7 +29,6 @@ export default function MonthlyRecordsPage() {
   ) {
     try {
       setLoading(true);
-      setError("");
 
       const res = await fetch(
         `http://localhost:5000/api/monthly-records?month=${selectedMonth}&year=${selectedYear}`,
@@ -38,16 +37,13 @@ export default function MonthlyRecordsPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch monthly records");
+        toast.error(result?.message || "Failed to fetch monthly records");
+        return; // ✅ IMPORTANT
       }
 
       setData(result);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong");
-      }
+    } catch {
+      toast.error("Something went wrong while fetching records");
     } finally {
       setLoading(false);
     }
@@ -59,8 +55,6 @@ export default function MonthlyRecordsPage() {
 
   async function handleMarkPaid(id: number) {
     try {
-      setError("");
-
       const res = await fetch(
         `http://localhost:5000/api/monthly-records/${id}/pay`,
         {
@@ -71,16 +65,16 @@ export default function MonthlyRecordsPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to mark as paid");
+        toast.error(result?.message || "Failed to mark as paid");
+        return; // ✅ IMPORTANT
       }
 
+      // ✅ success only when API succeeds
+      toast.success("Payment marked as paid");
+
       await fetchMonthlyRecords(month, year);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while updating payment status");
-      }
+    } catch {
+      toast.error("Something went wrong while updating payment");
     }
   }
 
@@ -122,7 +116,6 @@ export default function MonthlyRecordsPage() {
       </div>
 
       {loading && <div>Loading monthly records...</div>}
-      {error && <div className="mb-4 text-red-500">{error}</div>}
 
       {!loading && (
         <div className="overflow-x-auto rounded-lg border">

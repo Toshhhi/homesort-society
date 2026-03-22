@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Notification = {
   id: number;
@@ -44,7 +45,7 @@ export default function NotificationsPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -95,10 +96,10 @@ export default function NotificationsPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to send notification");
+        toast.error(result?.message || "Failed to send notification");
       }
 
-      setSuccess(result?.message || "Notification sent successfully");
+      toast.success(result?.message || "Notification sent successfully");
       setFormData({
         title: "",
         message: "",
@@ -112,7 +113,7 @@ export default function NotificationsPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong while sending notification");
+        toast.error("Something went wrong while sending notification");
       }
     } finally {
       setSaving(false);

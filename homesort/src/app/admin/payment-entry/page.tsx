@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type FlatOption = {
   id: number;
@@ -45,7 +46,7 @@ export default function PaymentEntryPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -96,10 +97,10 @@ export default function PaymentEntryPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to record payment");
+        toast.error(result?.message || "Failed to record payment");
       }
 
-      setSuccess("Payment recorded successfully");
+      toast.success("Payment recorded successfully");
 
       setFormData({
         flat_id: "",

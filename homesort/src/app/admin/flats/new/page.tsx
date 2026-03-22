@@ -1,5 +1,5 @@
 "use client";
-
+import { toast } from "sonner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -57,15 +57,16 @@ export default function AddFlatPage() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to add flat");
+        toast.error(errData?.message || "Failed to add flat");
       }
 
       router.push("/admin/flats");
+      toast.success("Flat Added Successfully!");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong while adding flat");
+        toast.error("Something went wrong while adding flat");
       }
     } finally {
       setSaving(false);
@@ -105,9 +106,7 @@ export default function AddFlatPage() {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">
-              Owner Name
-            </label>
+            <label className="mb-1 block text-sm font-medium">Owner Name</label>
             <input
               type="text"
               name="ownerName"
