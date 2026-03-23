@@ -13,7 +13,7 @@ export const getResidentDashboardStats = async (req, res) => {
         const currentYear = now.getFullYear();
         const residentResult = await pool.query(
             `
-      SELECT flat_id
+      SELECT flat_id, username
       FROM users
       WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))
       LIMIT 1
@@ -77,6 +77,7 @@ export const getResidentDashboardStats = async (req, res) => {
         const lastPayment = lastPaymentResult.rows[0] || null;
 
         return res.status(200).json({
+            name: residentResult.rows[0].username,
             currentStatus,
             pendingAmount,
             lastPaymentAmount: lastPayment ? lastPayment.amount : null,

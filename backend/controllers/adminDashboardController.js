@@ -2,6 +2,19 @@ import pool from "../config/db.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
+    const { email } = req.query;
+    let name = "Admin";
+    
+    if (email) {
+      const userResult = await pool.query(
+        `SELECT username FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM($1)) LIMIT 1`,
+        [email]
+      );
+      if (userResult.rows.length > 0 && userResult.rows[0].username) {
+        name = userResult.rows[0].username;
+      }
+    }
+
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
@@ -97,6 +110,7 @@ export const getDashboardStats = async (req, res) => {
         : 0;
 
     return res.status(200).json({
+      name,
       totalFlats,
       occupiedFlats,
       collectedThisMonth,
