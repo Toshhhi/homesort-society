@@ -1,27 +1,120 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/ui/Loader";
+import { getUser } from "@/lib/auth";
+import { toast } from "sonner";
 
 type PaymentState = "idle" | "processing" | "success";
+
+type ResidentDashboardStats = {
+  name?: string;
+  currentStatus: "paid" | "pending";
+  pendingAmount: number;
+  lastPaymentAmount: number | null;
+  lastPaymentDate: string | null;
+};
 
 export default function PayNowPage() {
   const router = useRouter();
   const [paymentState, setPaymentState] = useState<PaymentState>("idle");
   const [method, setMethod] = useState<"card" | "upi">("card");
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<ResidentDashboardStats | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState<string>("");
 
-  const billAmount = 2500;
-  const monthLabel = "October 2026";
-  const transactionId = `TXN${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+  useEffect(() => {
+    async function init() {
+      try {
+        setLoading(true);
+        const user = await getUser();
+        if (!user?.email) {
+          toast.error("User not found. Please log in again.");
+          router.push("/login");
+          return;
+        }
+        setUserEmail(user.email);
+        const res = await fetch(`http://localhost:5000/api/resident-dashboard/${encodeURIComponent(user.email)}`);
+        const result = await res.json().catch(() => null);
+        console.log("Dashboard result:", result);
+        if (res.ok) {
+          setStats(result);
+        } else {
+          toast.error(result?.message || "Failed to load dashboard stats");
+        }
+      } catch (err) {
+        toast.error("Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    }
+    init();
+  }, [router]);
 
-  function handlePay(e: React.FormEvent) {
+  const billAmount = stats?.pendingAmount || 0;
+  const monthLabel = "Pending Dues";
+
+  async function handlePay(e: React.FormEvent) {
     e.preventDefault();
+    if (!userEmail || billAmount <= 0) return;
+
     setPaymentState("processing");
 
-    setTimeout(() => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/resident-dashboard/${encodeURIComponent(userEmail)}/pay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: billAmount,
+          payment_mode: method,
+        }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Payment failed");
+      }
+
+      setTransactionId(data.payment?.transaction_id || `TXN${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
       setPaymentState("success");
-    }, 2500);
+      toast.success("Payment successful!");
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Payment failed. Please try again.");
+      }
+      setPaymentState("idle");
+    }
+  }
+
+  if (loading) {
+    return <Loader text="Loading your billing details..." />;
+  }
+
+  if (!stats || billAmount <= 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center animate-in fade-in duration-500">
+        <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-green-500/10 text-green-500">
+          <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-3xl font-extrabold text-white mb-3">All clear!</h2>
+        <p className="text-brand-gray max-w-sm mb-8 text-lg">
+          You have no pending payments at the moment. Your subscription is fully paid!
+        </p>
+        <button
+          onClick={() => router.push("/my-subscriptions")}
+          className="rounded-xl bg-brand-surface border border-brand-silver/20 px-6 py-3 font-semibold text-white shadow-lg hover:bg-brand-silver/10 transition-all active:translate-y-1"
+        >
+          View My Subscriptions
+        </button>
+      </div>
+    );
   }
 
   if (paymentState === "processing") {
@@ -39,7 +132,7 @@ export default function PayNowPage() {
     return (
       <div className="mx-auto mt-10 max-w-lg rounded-2xl border border-brand-silver/10 bg-brand-surface p-8 shadow-2xl relative overflow-hidden fade-in zoom-in-95 animate-in duration-300">
         <div className="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
-        
+
         <div className="flex flex-col items-center text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20 text-green-500">
             <svg
@@ -56,7 +149,7 @@ export default function PayNowPage() {
               />
             </svg>
           </div>
-          
+
           <h2 className="text-2xl font-bold text-white mb-2">Payment Successful!</h2>
           <p className="text-brand-gray mb-8">
             Your subscription for {monthLabel} has been paid.
@@ -67,17 +160,17 @@ export default function PayNowPage() {
               <span className="text-brand-gray">Transaction ID</span>
               <span className="font-mono text-white tracking-wider">{transactionId}</span>
             </div>
-            
+
             <div className="flex justify-between pb-2">
               <span className="text-brand-gray">Paid Amount</span>
               <span className="font-bold text-white text-lg">₹{billAmount.toLocaleString("en-IN")}</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-brand-gray">Payment Method</span>
               <span className="text-white uppercase">{method}</span>
             </div>
-            
+
             <div className="flex justify-between">
               <span className="text-brand-gray">Date & Time</span>
               <span className="text-white">{new Date().toLocaleString("en-IN")}</span>
@@ -115,18 +208,17 @@ export default function PayNowPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Payment Form */}
         <div className="lg:col-span-2 rounded-3xl border border-brand-silver/10 bg-brand-surface p-6 shadow-xl">
           <div className="mb-6 flex space-x-4 border-b border-brand-silver/10 pb-4">
             <button
               type="button"
               onClick={() => setMethod("card")}
-              className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all ${
-                method === "card" 
-                  ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/20" 
-                  : "bg-brand-dark text-brand-silver hover:text-white border border-brand-silver/10"
-              }`}
+              className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all ${method === "card"
+                ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/20"
+                : "bg-brand-dark text-brand-silver hover:text-white border border-brand-silver/10"
+                }`}
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -136,11 +228,10 @@ export default function PayNowPage() {
             <button
               type="button"
               onClick={() => setMethod("upi")}
-              className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all ${
-                method === "upi" 
-                  ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/20" 
-                  : "bg-brand-dark text-brand-silver hover:text-white border border-brand-silver/10"
-              }`}
+              className={`flex-1 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all ${method === "upi"
+                ? "bg-brand-accent text-white shadow-lg shadow-brand-accent/20"
+                : "bg-brand-dark text-brand-silver hover:text-white border border-brand-silver/10"
+                }`}
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -217,7 +308,7 @@ export default function PayNowPage() {
                   {/* Mock QR Code Pattern */}
                   <div className="w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxyZWN0IHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTAgMGgxMHYxMEgweiBNMTAgMTAgSDIwdjEwSDEweiBNMjAgMiBoMTB2MTBoLTEweiIgZmlsbD0iYmxhY2siLz4KPC9zdmc+')] bg-repeat opacity-80 rounded-xl mix-blend-multiply"></div>
                 </div>
-                
+
                 <div className="text-center w-full max-w-sm">
                   <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-brand-silver">
                     Or Enter VPA (UPI ID)
@@ -250,7 +341,7 @@ export default function PayNowPage() {
         <div className="lg:col-span-1">
           <div className="rounded-3xl border border-brand-silver/10 bg-brand-surface p-6 shadow-xl sticky top-6">
             <h3 className="text-lg font-bold text-white mb-6">Payment Summary</h3>
-            
+
             <div className="space-y-4 text-sm">
               <div className="flex justify-between items-center pb-4 border-b border-brand-silver/10">
                 <div className="flex items-center gap-3">
@@ -274,7 +365,7 @@ export default function PayNowPage() {
                 <span>Platform Fee</span>
                 <span className="text-white">₹0.00</span>
               </div>
-              
+
               <div className="pt-4 mt-2 border-t border-brand-silver/10 flex justify-between items-center text-lg font-bold text-white">
                 <span>Total</span>
                 <span className="text-brand-accent">₹{billAmount.toLocaleString("en-IN")}</span>
@@ -292,7 +383,7 @@ export default function PayNowPage() {
                 </p>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>

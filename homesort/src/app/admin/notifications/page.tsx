@@ -8,7 +8,7 @@ type Notification = {
   id: number;
   title: string;
   message: string;
-  sent_to: string;
+  type: string;
   created_at: string;
 };
 
@@ -18,13 +18,11 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
     message: "",
-    sent_to: "all",
+    recipient: "all",
     month: String(today.getMonth() + 1),
     year: String(today.getFullYear()),
   });
@@ -32,19 +30,19 @@ export default function NotificationsPage() {
   async function fetchNotifications() {
     try {
       setLoading(true);
-      setError("");
 
       const res = await fetch("http://localhost:5000/api/notifications");
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch notifications");
+        toast.error(result?.message || "Failed to fetch notifications");
+        return;
       }
 
       setNotifications(result);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
         toast.error("Something went wrong");
       }
@@ -74,17 +72,15 @@ export default function NotificationsPage() {
 
     try {
       setSaving(true);
-      setError("");
-      setSuccess("");
 
       const payload =
-        formData.sent_to === "pending_payment"
+        formData.recipient === "pending_payment"
           ? formData
           : {
-              title: formData.title,
-              message: formData.message,
-              sent_to: formData.sent_to,
-            };
+            title: formData.title,
+            message: formData.message,
+            recipient: formData.recipient,
+          };
 
       const res = await fetch("http://localhost:5000/api/notifications", {
         method: "POST",
@@ -98,13 +94,14 @@ export default function NotificationsPage() {
 
       if (!res.ok) {
         toast.error(result?.message || "Failed to send notification");
+        return;
       }
 
       toast.success(result?.message || "Notification sent successfully");
       setFormData({
         title: "",
         message: "",
-        sent_to: "all",
+        recipient: "all",
         month: String(today.getMonth() + 1),
         year: String(today.getFullYear()),
       });
@@ -112,7 +109,7 @@ export default function NotificationsPage() {
       await fetchNotifications();
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
         toast.error("Something went wrong while sending notification");
       }
@@ -131,9 +128,6 @@ export default function NotificationsPage() {
       </div>
 
       <div className="mb-8 max-w-2xl rounded-lg border bg-white p-6 shadow-sm">
-        {error && <div className="mb-4 text-red-500">{error}</div>}
-        {success && <div className="mb-4 text-green-600">{success}</div>}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium">Title</label>
@@ -162,8 +156,8 @@ export default function NotificationsPage() {
           <div>
             <label className="mb-1 block text-sm font-medium">Send To</label>
             <select
-              name="sent_to"
-              value={formData.sent_to}
+              name="recipient"
+              value={formData.recipient}
               onChange={handleChange}
               className="w-full rounded border px-3 py-2"
             >
@@ -174,7 +168,7 @@ export default function NotificationsPage() {
             </select>
           </div>
 
-          {formData.sent_to === "pending_payment" && (
+          {formData.recipient === "pending_payment" && (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-medium">Month</label>
@@ -227,7 +221,7 @@ export default function NotificationsPage() {
                 <div className="mb-2 flex items-start justify-between">
                   <h3 className="font-semibold">{notification.title}</h3>
                   <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600">
-                    {notification.sent_to}
+                    {notification.type}
                   </span>
                 </div>
 

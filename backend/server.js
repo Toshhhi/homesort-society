@@ -1,6 +1,8 @@
-import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+
+import cors from "cors";
 import passport from "passport";
 import session from "express-session";
 import subscriptionsRoutes from "./routes/subscriptionsRoutes.js";
@@ -18,7 +20,7 @@ import residentProfileRoutes from "./routes/residentProfileRoutes.js";
 import "./config/passport.js";
 import residentDashboardRoutes from "./routes/residentDashboardRoutes.js";
 import cookieParser from "cookie-parser";
-dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
