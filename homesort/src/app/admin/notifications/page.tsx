@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Notification = {
   id: number;
@@ -218,7 +219,7 @@ export default function NotificationsPage() {
         <h2 className="mb-4 text-lg font-semibold">Sent Notifications</h2>
 
         {loading ? (
-          <div>Loading notifications...</div>
+          <Loader text="Loading notifications..." />
         ) : notifications.length > 0 ? (
           <div className="space-y-4">
             {notifications.map((notification) => (

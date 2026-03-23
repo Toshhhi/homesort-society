@@ -13,6 +13,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Flat = {
   id: number;
@@ -164,7 +165,7 @@ export default function FlatsPage() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (loading) return <div className="p-6">Loading flats...</div>;
+  if (loading) return <Loader text="Loading flats..." />;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
 
   return (

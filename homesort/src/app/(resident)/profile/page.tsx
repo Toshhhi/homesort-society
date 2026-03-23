@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUser, logout } from "@/lib/auth";
+import Loader from "@/components/ui/Loader";
 
 type ResidentProfile = {
   id: number;
@@ -143,7 +144,7 @@ export default function ResidentProfilePage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading profile...</div>;
+    return <Loader text="Loading profile..." />;
   }
 
   return (

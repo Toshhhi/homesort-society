@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Summary = {
   total_records: string;
@@ -56,7 +57,6 @@ export default function ReportsPage() {
         toast.error(result?.message || "Failed to fetch report");
       }
 
-      toast.success("Successfully downloaded the report!");
       setSummary(result.summary || null);
       setPaymentModeBreakdown(result.paymentModeBreakdown || []);
       setMonthlyBreakdown(result.monthlyBreakdown || []);
@@ -82,6 +82,7 @@ export default function ReportsPage() {
         : `http://localhost:5000/api/reports/yearly/csv?year=${year}`;
 
     window.open(url, "_blank");
+    toast.success("Downloading report...");
   }
 
   return (
@@ -145,7 +146,7 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {loading && <div>Loading report...</div>}
+      {loading && <Loader text="Loading report..." />}
       {error && <div className="mb-4 text-red-500">{error}</div>}
 
       {!loading && summary && (

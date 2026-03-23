@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 const residentLinks = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "My Subscriptions", href: "/my-subscriptions" },
-  { label: "Pay Now", href: "/my-payments" },
+  { label: "Pay Now", href: "/pay-now" },
   { label: "Profile", href: "/profile" },
 ];
 

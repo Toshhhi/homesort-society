@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type FlatForm = {
   flatNumber: string;
@@ -106,7 +107,7 @@ export default function EditFlatPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading flat details...</div>;
+    return <Loader text="Loading flat details..." />;
   }
 
   return (

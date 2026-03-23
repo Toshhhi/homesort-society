@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type MonthlyRecord = {
   id: number;
@@ -115,7 +116,7 @@ export default function MonthlyRecordsPage() {
         </div>
       </div>
 
-      {loading && <div>Loading monthly records...</div>}
+      {loading && <Loader text="Loading monthly records..." />}
 
       {!loading && (
         <div className="overflow-x-auto rounded-lg border">

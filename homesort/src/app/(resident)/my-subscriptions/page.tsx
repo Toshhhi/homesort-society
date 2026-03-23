@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
+import Loader from "@/components/ui/Loader";
 
 type SubscriptionRecord = {
   id: number;
@@ -73,7 +74,7 @@ export default function ResidentSubscriptionsPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading subscriptions...</div>;
+    return <Loader text="Loading subscriptions..." />;
   }
 
   return (

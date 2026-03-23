@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getUser } from "@/lib/auth";
+import Loader from "@/components/ui/Loader";
 
 import {
   ResponsiveContainer,
@@ -94,7 +95,7 @@ export default function AdminDashboardPage() {
   }, [userChecked]);
 
   if (!userChecked || loading) {
-    return <div className="p-6">Loading dashboard...</div>;
+    return <Loader text="Loading dashboard..." />;
   }
 
   if (error) {

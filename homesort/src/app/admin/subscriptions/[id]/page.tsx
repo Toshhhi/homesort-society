@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Subscription = {
   id: number;
@@ -119,7 +120,7 @@ export default function EditSubscriptionPage() {
     }
   }
 
-  if (loading) return <div className="p-6">Loading subscription...</div>;
+  if (loading) return <Loader text="Loading subscription..." />;
   if (error && !subscription)
     return <div className="p-6 text-red-500">{error}</div>;
 

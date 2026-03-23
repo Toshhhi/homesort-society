@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getUser } from "@/lib/auth";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type SubscriptionDetail = {
   id: number;
@@ -90,7 +91,7 @@ export default function SubscriptionDetailPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading subscription detail...</div>;
+    return <Loader text="Loading subscription detail..." />;
   }
 
   if (!detail) {

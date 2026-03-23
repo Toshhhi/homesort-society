@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { logout } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type AdminProfile = {
   id: number;
@@ -268,7 +269,7 @@ export default function AdminProfilePage() {
     }
   }
 
-  if (loading) return <div className="p-6">Loading profile...</div>;
+  if (loading) return <Loader text="Loading profile..." />;
 
   return (
     <div className="p-10">

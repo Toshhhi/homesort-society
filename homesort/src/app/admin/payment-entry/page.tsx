@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type FlatOption = {
   id: number;
@@ -122,7 +123,7 @@ export default function PaymentEntryPage() {
     }
   }
 
-  if (loading) return <div className="p-6">Loading payment entry form...</div>;
+  if (loading) return <Loader text="Loading payment entry form..." />;
 
   return (
     <div className="p-6">

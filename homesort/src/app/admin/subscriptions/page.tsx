@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Subscription = {
   id: number;
@@ -49,7 +50,7 @@ export default function SubscriptionsPage() {
     router.push(`/admin/subscriptions/${plan.id}`);
   }
 
-  if (loading) return <div className="p-6">Loading subscriptions...</div>;
+  if (loading) return <Loader text="Loading subscriptions..." />;
 
   return (
     <div className="p-6">
