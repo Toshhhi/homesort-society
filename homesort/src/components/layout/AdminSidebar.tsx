@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-// import Navbar from "./Navbar";
 
 const adminLinks = [
   { label: "Dashboard", href: "/admin/dashboard" },

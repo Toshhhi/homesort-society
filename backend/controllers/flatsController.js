@@ -180,7 +180,7 @@ export const updateFlat = async (req, res) => {
 
     res.status(200).json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    console.error("UPDATE FLAT ERROR:", error);
     res.status(500).json({ message: "Failed to update flat" });
   }
 };
@@ -202,8 +202,7 @@ export const deleteFlat = async (req, res) => {
       message: "Flat and resident account deleted successfully!",
     });
   } catch (error) {
-    console.error(error);
-    console.log(error.message);
+    console.error("DELETE FLAT ERROR:", error);
     return res.status(500).json({ message: "Failed to delete flat!" });
   }
 };

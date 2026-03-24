@@ -5,10 +5,6 @@ import { getMe } from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.get("/test", (req, res) => {
-  res.json({ message: "Working route get1" });
-});
-
 router.get("/me", getMe);
 
 router.post("/login", async (req, res) => {

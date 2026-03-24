@@ -38,7 +38,6 @@ export default function PayNowPage() {
         setUserEmail(user.email);
         const res = await fetch(`http://localhost:5000/api/resident-dashboard/${encodeURIComponent(user.email)}`);
         const result = await res.json().catch(() => null);
-        console.log("Dashboard result:", result);
         if (res.ok) {
           setStats(result);
         } else {
