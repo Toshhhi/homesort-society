@@ -198,16 +198,13 @@ export const deleteFlat = async (req, res) => {
       return res.status(404).json({ message: "Flat not found!" });
     }
 
-    res.status(200).json({ message: "Flat deleted successfully!" });
+    return res.status(200).json({
+      message: "Flat and resident account deleted successfully!",
+    });
   } catch (error) {
-    if (error.code === "23503") {
-      return res.status(400).json({
-        message: "Cannot delete flat because users are assigned to it.",
-      });
-    }
-
     console.error(error);
-    res.status(500).json({ message: "Failed to delete flat!" });
+    console.log(error.message);
+    return res.status(500).json({ message: "Failed to delete flat!" });
   }
 };
 

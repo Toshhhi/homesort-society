@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm transition-all hover:shadow-md hover:border-brand-accent/30 group">
           <div>
             <p className="text-sm font-bold uppercase tracking-wider text-brand-gray group-hover:text-brand-silver transition-colors">
@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
-      
+
       <div className="rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm">
         <h3 className="text-xl font-bold text-white">Monthly Insights</h3>
         <p className="mt-1 text-sm text-brand-gray">
@@ -248,7 +248,7 @@ export default function AdminDashboardPage() {
             </ResponsiveContainer>
           </div>
         </div>
-     
+
         <div className="rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm">
           <h3 className="mb-4 text-xl font-bold text-white">
             Monthly Overview

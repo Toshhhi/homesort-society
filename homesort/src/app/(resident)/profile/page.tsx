@@ -186,9 +186,8 @@ export default function ResidentProfilePage() {
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Enter your phone number"
               disabled={!isEditing}
-              className={`w-full rounded border px-3 py-2 ${
-                isEditing ? "bg-white" : "bg-gray-100 text-gray-600"
-              }`}
+              className={`w-full rounded border px-3 py-2 ${isEditing ? "bg-white" : "bg-gray-100 text-gray-600"
+                }`}
             />
           </div>
 

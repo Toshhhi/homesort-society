@@ -324,9 +324,8 @@ export default function AdminProfilePage() {
               value={profileForm.username}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 
@@ -338,9 +337,8 @@ export default function AdminProfilePage() {
               value={profileForm.email}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 
@@ -352,9 +350,8 @@ export default function AdminProfilePage() {
               value={profileForm.phone}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 

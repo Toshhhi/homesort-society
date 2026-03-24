@@ -22,11 +22,9 @@ export default function ResidentSidebar() {
   }
 
   return (
-    <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl">
-      <div className="flex-1">
-        <div className="mb-10 px-2"></div>
-
-        <nav className="flex flex-col gap-3">
+    <aside className="no-scrollbar flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-brand-surface bg-brand-darker px-4 py-6 shadow-xl sticky top-16">
+      <div className="flex-1 overflow-y-auto">
+        <nav className="flex flex-col gap-2">
           {residentLinks.map((link) => {
             const isActive = pathname === link.href;
 
@@ -34,18 +32,16 @@ export default function ResidentSidebar() {
               <Link
                 key={`${link.label}-${link.href}`}
                 href={link.href}
-                className={`group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all duration-300 hover:translate-x-1 ${
-                  isActive
-                    ? "bg-brand-surface text-brand-white shadow-md shadow-brand-surface/50"
-                    : "text-brand-silver hover:bg-brand-surface hover:text-brand-white"
-                }`}
+                className={`group flex items-center rounded-xl px-4 py-3.5 text-base font-medium transition-all duration-300 hover:translate-x-1 ${isActive
+                  ? "bg-brand-surface text-brand-white shadow-md shadow-brand-surface/50"
+                  : "text-brand-silver hover:bg-brand-surface hover:text-brand-white"
+                  }`}
               >
                 <div
-                  className={`mr-4 h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                    isActive
-                      ? "bg-brand-accent shadow-[0_0_8px_0_var(--color-brand-accent)]"
-                      : "bg-brand-surface group-hover:bg-brand-accent"
-                  }`}
+                  className={`mr-4 h-2.5 w-2.5 rounded-full transition-all duration-300 ${isActive
+                    ? "bg-brand-accent shadow-[0_0_8px_0_var(--color-brand-accent)]"
+                    : "bg-brand-surface group-hover:bg-brand-accent"
+                    }`}
                 ></div>
                 {link.label}
               </Link>

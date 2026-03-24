@@ -157,9 +157,9 @@ export default function ResidentDashboardPage() {
           </p>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-6">
           {/* current status */}
-          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-5 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
+          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-gray transition-colors group-hover:text-brand-silver">
                 Current Status
@@ -177,8 +177,8 @@ export default function ResidentDashboardPage() {
 
             <div
               className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-sm ${isPaid
-                  ? "bg-brand-accent/20 text-brand-accent"
-                  : "bg-yellow-500/20 text-yellow-400"
+                ? "bg-brand-accent/20 text-brand-accent"
+                : "bg-yellow-500/20 text-yellow-400"
                 }`}
             >
               <CheckCircle className="h-6 w-6" />
@@ -186,7 +186,7 @@ export default function ResidentDashboardPage() {
           </div>
 
           {/* pending amount */}
-          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-5 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
+          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-gray transition-colors group-hover:text-brand-silver">
                 Pending Amount
@@ -207,7 +207,7 @@ export default function ResidentDashboardPage() {
           </div>
 
           {/* last payment */}
-          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-5 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
+          <div className="group flex w-full items-center justify-between rounded-2xl border border-brand-silver/10 bg-brand-surface p-6 shadow-sm transition-all hover:border-brand-accent/30 hover:shadow-md">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-brand-gray transition-colors group-hover:text-brand-silver">
                 Last Payment
@@ -267,8 +267,8 @@ export default function ResidentDashboardPage() {
                 <div
                   key={notif.id}
                   className={`flex gap-4 px-6 py-4 transition-all hover:bg-white/5 ${index !== notifications.length - 1
-                      ? "border-b border-brand-silver/10"
-                      : ""
+                    ? "border-b border-brand-silver/10"
+                    : ""
                     }`}
                 >
                   <div className="mt-1.5 flex shrink-0 flex-col items-center">

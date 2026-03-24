@@ -103,7 +103,7 @@ export default function PayNowPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-3xl font-extrabold text-white mb-3">All clear!</h2>
+        <h2 className="text-3xl font-extrabold text-black mb-3">All clear!</h2>
         <p className="text-brand-gray max-w-sm mb-8 text-lg">
           You have no pending payments at the moment. Your subscription is fully paid!
         </p>
@@ -199,7 +199,7 @@ export default function PayNowPage() {
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto fade-in animate-in duration-300">
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">
+        <h1 className="text-3xl font-extrabold tracking-tight text-black mb-2">
           Secure Checkout
         </h1>
         <p className="text-brand-gray">

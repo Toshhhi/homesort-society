@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Loader from "@/components/ui/Loader";
+import { useRouter } from "next/navigation";
 
 type MonthlyRecord = {
   id: number;
@@ -13,7 +14,7 @@ type MonthlyRecord = {
   month: number;
   year: number;
   amount: number;
-  status: "Paid" | "Pending";
+  status: "paid" | "pending";
   paid_at: string | null;
 };
 
@@ -23,6 +24,8 @@ export default function MonthlyRecordsPage() {
   const [year, setYear] = useState(String(today.getFullYear()));
   const [data, setData] = useState<MonthlyRecord[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const router = useRouter();
 
   async function fetchMonthlyRecords(
     selectedMonth: string,
@@ -39,7 +42,7 @@ export default function MonthlyRecordsPage() {
 
       if (!res.ok) {
         toast.error(result?.message || "Failed to fetch monthly records");
-        return; // ✅ IMPORTANT
+        return;
       }
 
       setData(result);
@@ -54,29 +57,8 @@ export default function MonthlyRecordsPage() {
     fetchMonthlyRecords(month, year);
   }, [month, year]);
 
-  async function handleMarkPaid(id: number) {
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/monthly-records/${id}/pay`,
-        {
-          method: "PUT",
-        },
-      );
-
-      const result = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        toast.error(result?.message || "Failed to mark as paid");
-        return; // ✅ IMPORTANT
-      }
-
-      // ✅ success only when API succeeds
-      toast.success("Payment marked as paid");
-
-      await fetchMonthlyRecords(month, year);
-    } catch {
-      toast.error("Something went wrong while updating payment");
-    }
+  function handleMarkPaid(id: number) {
+    router.push(`/admin/payment-entry?record_id=${id}`);
   }
 
   return (
@@ -97,11 +79,14 @@ export default function MonthlyRecordsPage() {
             onChange={(e) => setMonth(e.target.value)}
             className="rounded border px-3 py-2"
           >
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={String(i + 1)}>
-                {i + 1}
-              </option>
-            ))}
+            {Array.from({ length: 12 }, (_, i) => {
+              const monthName = new Date(0, i).toLocaleString("en-US", { month: "long" });
+              return (
+                <option key={i + 1} value={String(i + 1)}>
+                  {monthName}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -145,11 +130,10 @@ export default function MonthlyRecordsPage() {
                     </td>
                     <td className="border-b px-4 py-3">
                       <span
-                        className={`rounded px-2 py-1 text-sm font-medium ${
-                          record.status === "Paid"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
+                        className={`rounded px-2 py-1 text-sm font-medium ${record.status === "paid"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                          }`}
                       >
                         {record.status}
                       </span>
@@ -160,7 +144,7 @@ export default function MonthlyRecordsPage() {
                         : "-"}
                     </td>
                     <td className="border-b px-4 py-3">
-                      {record.status === "Pending" ? (
+                      {record.status === "pending" ? (
                         <button
                           onClick={() => handleMarkPaid(record.id)}
                           className="rounded bg-green-600 px-3 py-1 text-white font-semibold hover:bg-green-700 transition"

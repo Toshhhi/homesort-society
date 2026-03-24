@@ -117,11 +117,10 @@ export default function ResidentSubscriptionsPage() {
 
                   <td className="border-b px-4 py-3">
                     <span
-                      className={`rounded px-2 py-1 text-sm font-medium ${
-                        record.status?.toLowerCase().trim() === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
+                      className={`rounded px-2 py-1 text-sm font-medium ${record.status?.toLowerCase().trim() === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                        }`}
                     >
                       {record.status}
                     </span>
