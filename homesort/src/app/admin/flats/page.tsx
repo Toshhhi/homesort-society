@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   createColumnHelper,
   flexRender,
@@ -11,6 +12,8 @@ import {
   useReactTable,
   SortingState,
 } from "@tanstack/react-table";
+import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type Flat = {
   id: number;
@@ -20,31 +23,15 @@ type Flat = {
   email: string;
 };
 
-type FlatForm = {
-  flatNumber: string;
-  flatType: string;
-  ownerName: string;
-  email: string;
-};
-
 const columnHelper = createColumnHelper<Flat>();
 
 export default function FlatsPage() {
+  const router = useRouter();
   const [data, setData] = useState<Flat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFlat, setSelectedFlat] = useState<Flat | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  const [formData, setFormData] = useState<FlatForm>({
-    flatNumber: "",
-    flatType: "",
-    ownerName: "",
-    email: "",
-  });
 
   async function fetchFlats() {
     try {
@@ -72,7 +59,7 @@ export default function FlatsPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong!");
       }
     } finally {
       setLoading(false);
@@ -84,117 +71,40 @@ export default function FlatsPage() {
   }, []);
 
   function handleAddFlat() {
-    setSelectedFlat(null);
-    setFormData({
-      flatNumber: "",
-      flatType: "",
-      ownerName: "",
-      email: "",
-    });
-    setIsModalOpen(true);
+    router.push("/admin/flats/new");
   }
 
+  // UPDATED: Edit now navigates to a new page
   function handleEditFlat(flat: Flat) {
-    setSelectedFlat(flat);
-    setFormData({
-      flatNumber: flat.flatNumber,
-      flatType: flat.flatType,
-      ownerName: flat.ownerName,
-      email: flat.email,
-    });
-    setIsModalOpen(true);
+    router.push(`/admin/flats/${flat.id}`);
   }
 
-  function handleInputChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  async function handleSaveFlat(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    try {
-      setSaving(true);
-      setError("");
-
-      const payload = {
-        flat_no: formData.flatNumber,
-        flat_type: formData.flatType,
-        owner: formData.ownerName,
-        email: formData.email,
-      };
-
-      let res: Response;
-
-      if (selectedFlat) {
-        res = await fetch(
-          `http://localhost:5000/api/flats/${selectedFlat.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          },
-        );
-      } else {
-        res = await fetch("http://localhost:5000/api/flats", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to save flat");
-      }
-
-      await fetchFlats();
-      setIsModalOpen(false);
-      setSelectedFlat(null);
-      setFormData({
-        flatNumber: "",
-        flatType: "",
-        ownerName: "",
-        email: "",
-      });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while saving");
-      }
-    } finally {
-      setSaving(false);
-    }
-  }
-
+  // UPDATED: Delete now asks for confirmation first
   async function handleDeleteFlat(id: number) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this flat?",
+    );
+
+    if (!confirmed) return;
+
     try {
       const res = await fetch(`http://localhost:5000/api/flats/${id}`, {
         method: "DELETE",
       });
-      console.log("Deleting flat id:", id);
+
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
-        throw new Error(errData?.message || "Failed to delete flat");
+
+        toast.error(errData?.message || "Failed to delete flat");
+        return;
       }
+
+      // ✅ success toast
+      toast.success("Flat deleted successfully");
 
       await fetchFlats();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong while deleting");
-      }
+      toast.error("Something went wrong while deleting!");
     }
   }
 
@@ -255,9 +165,8 @@ export default function FlatsPage() {
     getPaginationRowModel: getPaginationRowModel(),
   });
 
-  if (loading) return <div className="p-6">Loading flats...</div>;
-  if (error && !isModalOpen)
-    return <div className="p-6 text-red-500">{error}</div>;
+  if (loading) return <Loader text="Loading flats..." />;
+  if (error) return <div className="p-6 text-red-500">{error}</div>;
 
   return (
     <div className="p-6">
@@ -350,98 +259,6 @@ export default function FlatsPage() {
           Next
         </button>
       </div>
-
-      {isModalOpen && (
-        <div className="mt-6 rounded border bg-white p-4 shadow">
-          <h2 className="mb-4 text-xl font-semibold">
-            {selectedFlat ? "Edit Flat" : "Add Flat"}
-          </h2>
-
-          {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
-
-          <form onSubmit={handleSaveFlat} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">Flat No</label>
-              <input
-                type="text"
-                name="flatNumber"
-                value={formData.flatNumber}
-                onChange={handleInputChange}
-                required
-                className="w-full rounded border px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Flat Type
-              </label>
-              <input
-                type="text"
-                name="flatType"
-                value={formData.flatType}
-                onChange={handleInputChange}
-                required
-                className="w-full rounded border px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Owner Name
-              </label>
-              <input
-                type="text"
-                name="ownerName"
-                value={formData.ownerName}
-                onChange={handleInputChange}
-                required
-                className="w-full rounded border px-3 py-2"
-              />
-            </div>
-
-            <div>
-              <label className="mb-1 block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full rounded border px-3 py-2"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
-              >
-                {saving
-                  ? selectedFlat
-                    ? "Updating..."
-                    : "Adding..."
-                  : selectedFlat
-                    ? "Update Flat"
-                    : "Add Flat"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setSelectedFlat(null);
-                  setError("");
-                }}
-                className="rounded border px-4 py-2"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </div>
   );
 }

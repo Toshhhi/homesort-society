@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { getUser } from "@/lib/auth";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type SubscriptionDetail = {
   id: number;
@@ -26,32 +28,32 @@ type SubscriptionDetail = {
 export default function SubscriptionDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-
   const router = useRouter();
 
   const [detail, setDetail] = useState<SubscriptionDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   async function fetchDetail() {
     try {
       setLoading(true);
-      setError("");
 
       const user = await getUser();
 
       if (!user?.email) {
-        throw new Error("User not found. Please log in again.");
+        toast.error("User not found. Please log in again.");
+        return;
       }
 
       const month = params.month;
       const year = searchParams.get("year");
 
       if (!month) {
-        throw new Error("Month is required!");
+        toast.error("Month is required!");
+        return;
       }
       if (!year) {
-        throw new Error("Year is required");
+        toast.error("Year is required");
+        return;
       }
 
       const res = await fetch(
@@ -61,17 +63,16 @@ export default function SubscriptionDetailPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(
-          result?.message || "Failed to fetch subscription detail",
-        );
+        toast.error(result?.message || "Failed to fetch subscription detail");
+        return;
       }
 
       setDetail(result);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -90,11 +91,7 @@ export default function SubscriptionDetailPage() {
   }
 
   if (loading) {
-    return <div className="p-6">Loading subscription detail...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-500">{error}</div>;
+    return <Loader text="Loading subscription detail..." />;
   }
 
   if (!detail) {

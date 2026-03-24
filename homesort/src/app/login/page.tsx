@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { saveUser } from "@/lib/auth";
+import { toast } from "sonner";
 
 export default function Login() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function Login() {
   async function handleGoogleLogIn() {
     window.location.href = "http://localhost:5000/api/googleAuth";
   }
-  
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
@@ -34,10 +35,12 @@ export default function Login() {
     const data = await res.json();
 
     if (!res.ok) {
-      setError(data.message || "Login failed");
+      toast.error(data.message || "Login failed");
       setLoading(false);
       return;
     }
+
+    toast.success("Succesfully logged in!");
 
     saveUser({
       role: data.role,
@@ -55,13 +58,12 @@ export default function Login() {
     <div
       className="relative min-h-screen flex items-center justify-center px-4 bg-cover bg-center"
       style={{
-        backgroundImage: "url('/login-bg.jpg')", // Assuming you have a background image
+        backgroundImage: "url('/login-bg.jpg')",
       }}
     >
       <div className="absolute inset-0 bg-brand-dark/60"></div>
 
       <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-brand-silver/20 bg-brand-surface shadow-2xl">
-        {/* Toggle Header */}
         <div className="flex w-full border-b border-brand-silver/10">
           <button
             onClick={() => setRole("resident")}

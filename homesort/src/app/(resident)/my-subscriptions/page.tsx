@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
+import Loader from "@/components/ui/Loader";
 
 type SubscriptionRecord = {
   id: number;
@@ -21,17 +23,16 @@ export default function ResidentSubscriptionsPage() {
 
   const [records, setRecords] = useState<SubscriptionRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   async function fetchSubscriptions() {
     try {
       setLoading(true);
-      setError("");
 
       const user = await getUser();
 
       if (!user?.email) {
-        throw new Error("User not found. Please log in again.");
+        toast.error("User not found. Please log in again.");
+        return;
       }
 
       const res = await fetch(
@@ -41,15 +42,16 @@ export default function ResidentSubscriptionsPage() {
       const result = await res.json().catch(() => null);
 
       if (!res.ok) {
-        throw new Error(result?.message || "Failed to fetch subscriptions");
+        toast.error(result?.message || "Failed to fetch subscriptions");
+        return;
       }
 
       setRecords(result);
     } catch (err) {
       if (err instanceof Error) {
-        setError(err.message);
+        toast.error(err.message);
       } else {
-        setError("Something went wrong");
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -67,17 +69,12 @@ export default function ResidentSubscriptionsPage() {
     });
   }
 
-  // ADDED: row click handler to open detail page
   function handleRowClick(month: number, year: number) {
     router.push(`/my-subscriptions/${month}?year=${year}`);
   }
 
   if (loading) {
-    return <div className="p-6">Loading subscriptions...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-500">{error}</div>;
+    return <Loader text="Loading subscriptions..." />;
   }
 
   return (
@@ -120,11 +117,10 @@ export default function ResidentSubscriptionsPage() {
 
                   <td className="border-b px-4 py-3">
                     <span
-                      className={`rounded px-2 py-1 text-sm font-medium ${
-                        record.status?.toLowerCase().trim() === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
+                      className={`rounded px-2 py-1 text-sm font-medium ${record.status?.toLowerCase().trim() === "paid"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                        }`}
                     >
                       {record.status}
                     </span>

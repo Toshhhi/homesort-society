@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logout } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Loader from "@/components/ui/Loader";
 
 type AdminProfile = {
   id: number;
@@ -17,6 +21,8 @@ export default function AdminProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const router = useRouter();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [showPasswordCard, setShowPasswordCard] = useState(false);
@@ -51,7 +57,7 @@ export default function AdminProfilePage() {
         throw new Error(result?.message || "Failed to fetch logged-in user");
       }
 
-      setAdminId(result.id);
+      setAdminId(result.user?.id ?? result.id ?? null);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -120,14 +126,16 @@ export default function AdminProfilePage() {
     }));
   }
 
-  function handleEditProfile() {
+  function handleEditProfile(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setSuccess("");
     setError("");
     setIsEditingProfile(true);
     setShowPasswordCard(false);
   }
 
-  function handleCancelEditProfile() {
+  function handleCancelEditProfile(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setIsEditingProfile(false);
     setSuccess("");
     setError("");
@@ -141,14 +149,16 @@ export default function AdminProfilePage() {
     }
   }
 
-  function handleShowPasswordCard() {
+  function handleShowPasswordCard(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setSuccess("");
     setError("");
     setShowPasswordCard(true);
     setIsEditingProfile(false);
   }
 
-  function handleCancelPasswordChange() {
+  function handleCancelPasswordChange(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
     setShowPasswordCard(false);
     setSuccess("");
     setError("");
@@ -204,6 +214,12 @@ export default function AdminProfilePage() {
     }
   }
 
+  async function handleLogout(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    await logout();
+    window.location.href = "/login";
+  }
+
   async function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -234,7 +250,7 @@ export default function AdminProfilePage() {
       if (!res.ok) {
         throw new Error(result?.message || "Failed to update password");
       }
-
+      toast.success("Profile updated!");
       setSuccess(result?.message || "Password updated successfully");
       setShowPasswordCard(false);
       setPasswordForm({
@@ -246,14 +262,14 @@ export default function AdminProfilePage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError("Something went wrong while updating password");
+        toast.error("Something went wrong while updating password");
       }
     } finally {
       setSavingPassword(false);
     }
   }
 
-  if (loading) return <div className="p-6">Loading profile...</div>;
+  if (loading) return <Loader text="Loading profile..." />;
 
   return (
     <div className="p-10">
@@ -308,9 +324,8 @@ export default function AdminProfilePage() {
               value={profileForm.username}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 
@@ -322,9 +337,8 @@ export default function AdminProfilePage() {
               value={profileForm.email}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 
@@ -336,9 +350,8 @@ export default function AdminProfilePage() {
               value={profileForm.phone}
               onChange={handleProfileChange}
               disabled={!isEditingProfile}
-              className={`w-full rounded border px-3 py-2 ${
-                !isEditingProfile ? "bg-gray-100 text-gray-500" : ""
-              }`}
+              className={`w-full rounded border px-3 py-2 ${!isEditingProfile ? "bg-gray-100 text-gray-500" : ""
+                }`}
             />
           </div>
 
@@ -434,8 +447,28 @@ export default function AdminProfilePage() {
               >
                 Cancel
               </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded border border-red-400 px-4 py-2 text-red-500 hover:bg-red-50"
+              >
+                Logout
+              </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {!showPasswordCard && !isEditingProfile && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded border border-red-400 px-4 py-2 text-red-500 hover:bg-red-50"
+          >
+            Logout
+          </button>
         </div>
       )}
     </div>

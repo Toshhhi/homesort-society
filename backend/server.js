@@ -1,6 +1,8 @@
-import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
+
+import cors from "cors";
 import passport from "passport";
 import session from "express-session";
 import subscriptionsRoutes from "./routes/subscriptionsRoutes.js";
@@ -14,9 +16,11 @@ import notificationsRoutes from "./routes/notificationsRoutes.js";
 import adminProfilePageRoutes from "./routes/adminProfileRoutes.js";
 import residentSubscirptionRoutes from "./routes/residentSubscriptionRoutes.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes.js";
+import residentProfileRoutes from "./routes/residentProfileRoutes.js";
 import "./config/passport.js";
+import residentDashboardRoutes from "./routes/residentDashboardRoutes.js";
 import cookieParser from "cookie-parser";
-dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -52,6 +56,8 @@ app.use("/api/notifications", notificationsRoutes);
 app.use("/api/admin/profile", adminProfilePageRoutes);
 app.use("/api/resident-subscriptions", residentSubscirptionRoutes);
 app.use("/api/dashboard", adminDashboardRoutes);
+app.use("/api/resident-dashboard", residentDashboardRoutes);
+app.use("/api/resident-profile", residentProfileRoutes);
 app.get("/", (req, res) => {
   res.send("running");
 });
